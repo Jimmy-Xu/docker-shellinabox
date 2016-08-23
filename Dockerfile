@@ -19,8 +19,8 @@ ENV SIAB_VERSION=2.19 \
 
 RUN apt-get update && apt-get install -y openssl curl openssh-client sudo \
       shellinabox=${SIAB_VERSION} && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+#  apt-get clean && \
+#  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
   ln -sf '/etc/shellinabox/options-enabled/00+Black on White.css' \
     /etc/shellinabox/options-enabled/00+Black-on-White.css && \
   ln -sf '/etc/shellinabox/options-enabled/00_White On Black.css' \
@@ -32,7 +32,16 @@ EXPOSE 4200
 
 VOLUME /etc/shellinabox /var/log/supervisor /home
 
-ADD assets/entrypoint.sh /usr/local/sbin/
 
+############################
+##add hypercli
+ENV ACCESS_KEY ${ACCESS_KEY:-}
+ENV SECRET_KEY ${SECRET_KEY:-}
+
+RUN apt-get install -y wget
+RUN wget http://hyper-install.s3.amazonaws.com/hyper-linux-x86_64.tar.gz -O /tmp/hyper-linux-x86_64.tar.gz \
+&& tar xzvf /tmp/hyper-linux-x86_64.tar.gz -C /usr/bin && chmod +x /usr/bin/hyper
+
+ADD assets/entrypoint.sh /usr/local/sbin/
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["shellinabox"]

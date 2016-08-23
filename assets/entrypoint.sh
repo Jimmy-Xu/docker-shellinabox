@@ -42,6 +42,29 @@ if [ "${SIAB_ADDUSER}" == "true" ]; then
 	fi
 fi
 
+
+if [ "${ACCESS_KEY}" != "" ] || [ "${SECRET_KEY}" != "" ];then
+  mkdir -p /home/${SIAB_USER}/.hyper
+  cat > /home/${SIAB_USER}/.hyper/config.json <<EOF
+{
+	"auths": {
+	},
+	"clouds": {
+		"tcp://us-west-1.hyper.sh:443": {
+			"accesskey": "${ACCESS_KEY}",
+			"secretkey": "${SECRET_KEY}"
+		}
+	}
+}
+EOF
+  chown ${SIAB_USER}. /home/${SIAB_USER} -R
+else
+  cat <<EOF
+Please run 'hyper config' first
+If you have not Hyper_ Credential, please create it at https://console.hyper.sh
+EOF
+fi
+
 for service in ${SIAB_SERVICE}; do
 	COMMAND+=" -s ${service}"
 done
